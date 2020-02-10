@@ -177,13 +177,13 @@ if len(sys.argv) >= 2:
                                         'negative': is_negative,
                                         'subjectivity_score': pattern_subjectivity,
                                         'subjective': is_subjective,
+                                        'url': "https://reddit.com" + comment.permalink,
                                         'comment_date': comment_date,
                                         'comment_timestamp': comment_timestamp,
+                                        'comment_day': dt.day
                                         'comment_hour': dt.hour,
-                                        'comment_day': dt.day,
-                                        'comment_month': dt.month,
                                         'comment_year': dt.year,
-                                        'url': "https://reddit.com" + comment.permalink,
+                                        'comment_month': dt.month,
                                     }
 
                         comments_processed = comments_processed + 1
