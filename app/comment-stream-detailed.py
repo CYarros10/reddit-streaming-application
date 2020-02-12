@@ -12,8 +12,8 @@ from better_profanity import profanity
 from time import sleep
 from datetime import datetime, timezone
 
-firehose_client = boto3.client('firehose', region_name="us-east-1")
-sns_client = boto3.client('sns', region_name="us-east-1")
+firehose_client = boto3.client('firehose', region_name="<insert-region-here>")
+sns_client = boto3.client('sns', region_name="<insert-region-here>")
 sns_targetARN = "<insert-sns-target-arn>"
 
 def utc_to_local(utc_dt):
