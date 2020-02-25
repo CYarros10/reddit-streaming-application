@@ -180,10 +180,10 @@ if len(sys.argv) >= 2:
                                         'url': "https://reddit.com" + comment.permalink,
                                         'comment_date': comment_date,
                                         'comment_timestamp': comment_timestamp,
-                                        'comment_day': dt.day
+                                        'comment_day': dt.day,
                                         'comment_hour': dt.hour,
                                         'comment_year': dt.year,
-                                        'comment_month': dt.month,
+                                        'comment_month': dt.month
                                     }
 
                         comments_processed = comments_processed + 1
@@ -215,7 +215,7 @@ if len(sys.argv) >= 2:
         except Exception as e:
             print(str(e))
             error_msg = " An error has occured in the comment stream:" + str(e)
-            curr_date = datetime.datetime.now().strftime("%m/%d/%Y")
+            curr_date = datetime.now().strftime("%m/%d/%Y")
             subject = "Reddit App Alert: "+ str(curr_date)
 
             # If too many requests error, we need to wait longer for throttle to end. otherwise start back up right away.
