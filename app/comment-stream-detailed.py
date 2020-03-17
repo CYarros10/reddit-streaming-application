@@ -188,10 +188,10 @@ if len(sys.argv) >= 2:
 
                         comments_processed = comments_processed + 1
 
-                        print("==================================")
+                        # print("==================================")
                         num_comments_collected = num_comments_collected + 1
-                        print(num_comments_collected)
-                        print(commentjson)
+                        # print(num_comments_collected)
+                        # print(commentjson)
 
                         # If batch_delivery is true, deliver to firehose in batches of 500 records. Otherwise, send each record individually
                         if(batch_delivery):
