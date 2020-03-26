@@ -219,7 +219,8 @@ if len(sys.argv) >= 2:
             subject = "Reddit App Alert: "+ str(curr_date)
 
             # If too many requests error, we need to wait longer for throttle to end. otherwise start back up right away.
-            http_response = int(filter(str.isdigit, str(e)))
+            error_code = "".join(filter(str.isdigit, str(e)))
+            http_response = int(error_code)
             if (http_response == 429):
                 error_msg = error_msg + " - Too many requests. Restarting stream in 60 minutes."
                 send_sns_alert(error_msg, subject)
