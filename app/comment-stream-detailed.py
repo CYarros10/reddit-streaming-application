@@ -224,7 +224,7 @@ if len(sys.argv) >= 2:
             if (http_response == 429):
                 error_msg = error_msg + " - Too many requests. Restarting stream in 60 minutes."
                 send_sns_alert(error_msg, subject)
-                sleep(3600)
+                sleep(7200)
             else:
                 error_msg = error_msg + " - Restarting stream now."
                 send_sns_alert(error_msg, subject)
