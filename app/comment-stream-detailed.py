@@ -222,7 +222,7 @@ if len(sys.argv) >= 2:
             error_code = "".join(filter(str.isdigit, str(e)))
             http_response = int(error_code)
             if (http_response == 429):
-                error_msg = error_msg + " - Too many requests. Restarting stream in 60 minutes."
+                error_msg = error_msg + " - Too many requests. Restarting stream in 2 hours."
                 send_sns_alert(error_msg, subject)
                 sleep(7200)
             else:
