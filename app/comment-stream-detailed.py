@@ -96,7 +96,7 @@ if len(sys.argv) >= 2:
             for comment in comment_stream.stream.comments():
 
                 # throttle to avoid 429 error
-                sleep(0.6)
+                sleep(0.5)
 
                 # empty check
                 if (comment):
