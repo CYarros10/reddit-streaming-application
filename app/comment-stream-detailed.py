@@ -180,10 +180,10 @@ if len(sys.argv) >= 2:
                                         'url': "https://reddit.com" + comment.permalink,
                                         'comment_date': comment_date,
                                         'comment_timestamp': comment_timestamp,
-                                        'comment_day': dt.day,
                                         'comment_hour': dt.hour,
                                         'comment_year': dt.year,
                                         'comment_month': dt.month
+                                        'comment_day': dt.day,
                                     }
 
                         comments_processed = comments_processed + 1
