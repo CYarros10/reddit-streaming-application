@@ -182,8 +182,8 @@ if len(sys.argv) >= 2:
                                         'comment_timestamp': comment_timestamp,
                                         'comment_hour': dt.hour,
                                         'comment_year': dt.year,
-                                        'comment_month': dt.month
-                                        'comment_day': dt.day,
+                                        'comment_month': dt.month,
+                                        'comment_day': dt.day
                                     }
 
                         comments_processed = comments_processed + 1
