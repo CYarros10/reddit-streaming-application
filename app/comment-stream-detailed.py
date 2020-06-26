@@ -13,8 +13,8 @@ from time import sleep
 from datetime import datetime, timezone
 
 firehose_client = boto3.client('firehose', region_name="us-east-1")
-sns_client = boto3.client('sns', region_name="us-east-1")
-sns_targetARN = "<insert-sns-target-arn>"
+#sns_client = boto3.client('sns', region_name="us-east-1")
+#sns_targetARN = "<insert-sns-target-arn>"
 
 def utc_to_local(utc_dt):
     return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
@@ -77,7 +77,7 @@ if len(sys.argv) >= 2:
     while True:
 
         begin_msg = "starting comment stream... "
-        send_sns_alert(begin_msg, "comment stream initiation")
+        #send_sns_alert(begin_msg, "comment stream initiation")
 
         try:
             r = praw.Reddit('bot1')
@@ -223,11 +223,11 @@ if len(sys.argv) >= 2:
             http_response = int(error_code)
             if (http_response == 429):
                 error_msg = error_msg + " - Too many requests. Restarting stream in 2 hours."
-                send_sns_alert(error_msg, subject)
+                #send_sns_alert(error_msg, subject)
                 sleep(7200)
             else:
                 error_msg = error_msg + " - Restarting stream now."
-                send_sns_alert(error_msg, subject)
+                #send_sns_alert(error_msg, subject)
 
 else:
     print("please enter subreddit.")
