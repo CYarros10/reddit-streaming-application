@@ -16,6 +16,12 @@ firehose_client = boto3.client('firehose', region_name="us-east-1")
 sns_client = boto3.client('sns', region_name="us-east-1")
 sns_targetARN = "<insert-sns-target-arn>"
 
+bot_list = ['AutoModerator', 'keepthetips', 'MAGIC_EYE_BOT',
+            'Funny_Sentinel', 'Funny-Mod', 'Showerthoughts_Mod', 'autotldr',
+            'art_moderator_bot', 'ApiContraption', 'WSBVoteBot', 'FittitBot',
+            'Photoshopbattlesbot', 'dataisbeautiful-bot', 'timestamp_bot',
+            'remindditbot', 'converter-bot', 'lntipbot']
+
 def utc_to_local(utc_dt):
     return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
 
@@ -101,116 +107,119 @@ if len(sys.argv) >= 2:
                 # empty check
                 if (comment):
                     commentbody = comment.body
+                    author = comment.author
 
-                    if (len(commentbody) > 0 and len(commentbody) < 5000):
+                    if author not in bot_list:
 
-                        #censor check
-                        if profanity.contains_profanity(str(commentbody)):
-                            is_censored = 1
-                        else:
-                            is_censored = 0
+                        if (len(commentbody) > 0 and len(commentbody) < 5000):
 
-                        # remove emojis
-                        cleaned_comment = remove_emoji(str(commentbody))
+                            #censor check
+                            if profanity.contains_profanity(str(commentbody)):
+                                is_censored = 1
+                            else:
+                                is_censored = 0
 
-                        # comment date
-                        comment_date = str(datetime.utcfromtimestamp(comment.created_utc).strftime('%Y-%m-%d %H:%M:%S'))
+                            # remove emojis
+                            cleaned_comment = remove_emoji(str(commentbody))
 
-                        #compartmentalize and localize date for easier searching
-                        dt = utc_to_local(datetime.strptime(comment_date, '%Y-%m-%d %H:%M:%S'))
-                        comment_timestamp = dt.strftime('%Y/%m/%d %H:%M:%S')
+                            # comment date
+                            comment_date = str(datetime.utcfromtimestamp(comment.created_utc).strftime('%Y-%m-%d %H:%M:%S'))
 
-                        # comment sentiment and subjectivity
-                        sentiment = get_comment_sentiment(cleaned_comment)
-                        pattern_polarity = round(sentiment.polarity,4)
-                        pattern_subjectivity = round(sentiment.subjectivity, 4)
+                            #compartmentalize and localize date for easier searching
+                            dt = utc_to_local(datetime.strptime(comment_date, '%Y-%m-%d %H:%M:%S'))
+                            comment_timestamp = dt.strftime('%Y/%m/%d %H:%M:%S')
 
-                        is_positive = 0
-                        is_neutral = 0
-                        is_negative = 0
+                            # comment sentiment and subjectivity
+                            sentiment = get_comment_sentiment(cleaned_comment)
+                            pattern_polarity = round(sentiment.polarity,4)
+                            pattern_subjectivity = round(sentiment.subjectivity, 4)
 
-                        if (pattern_polarity > 0.3):
-                            is_positive = 1
-                        elif (pattern_polarity >= -0.3 and pattern_polarity <= 0.3):
-                            is_neutral = 1
-                        else:
-                            is_negative = 1
+                            is_positive = 0
+                            is_neutral = 0
+                            is_negative = 0
 
-                        is_subjective = 0
-                        if (pattern_subjectivity > 0.7):
-                            is_subjective = 1
+                            if (pattern_polarity > 0.3):
+                                is_positive = 1
+                            elif (pattern_polarity >= -0.3 and pattern_polarity <= 0.3):
+                                is_neutral = 1
+                            else:
+                                is_negative = 1
 
-                        # language
-                        comment_language = get_comment_language(cleaned_comment)
+                            is_subjective = 0
+                            if (pattern_subjectivity > 0.7):
+                                is_subjective = 1
 
-                        # Readability statistics
-                        comment_reading_ease_score = textstat.flesch_reading_ease(cleaned_comment)
-                        comment_reading_ease = ''
-                        if (comment_reading_ease_score >= 80):
-                            comment_reading_ease = 'easy'
-                        elif (comment_reading_ease_score > 50 and comment_reading_ease_score < 80):
-                            comment_reading_ease = 'standard'
-                        else:
-                            comment_reading_ease = 'difficult'
+                            # language
+                            comment_language = get_comment_language(cleaned_comment)
 
-                        comment_reading_grade_level = textstat.text_standard(cleaned_comment, float_output=False)
+                            # Readability statistics
+                            comment_reading_ease_score = textstat.flesch_reading_ease(cleaned_comment)
+                            comment_reading_ease = ''
+                            if (comment_reading_ease_score >= 80):
+                                comment_reading_ease = 'easy'
+                            elif (comment_reading_ease_score > 50 and comment_reading_ease_score < 80):
+                                comment_reading_ease = 'standard'
+                            else:
+                                comment_reading_ease = 'difficult'
 
-                        # censor and lower
-                        censored_comment = profanity.censor(cleaned_comment).lower()
+                            comment_reading_grade_level = textstat.text_standard(cleaned_comment, float_output=False)
 
-                        commentjson = {
-                                        'comment_id': str(comment),
-                                        'subreddit': str(comment.subreddit),
-                                        'author': str(comment.author),
-                                        'comment_text': censored_comment,
-                                        'distinguished': comment.distinguished,
-                                        'submitter': comment.is_submitter,
-                                        'total_words': len(cleaned_comment.split()),
-                                        'reading_ease_score': comment_reading_ease_score,
-                                        'reading_ease': comment_reading_ease,
-                                        'reading_grade_level': comment_reading_grade_level,
-                                        'sentiment_score': pattern_polarity,
-                                        'censored': is_censored,
-                                        'comment_language': comment_language,
-                                        'positive': is_positive,
-                                        'neutral': is_neutral,
-                                        'negative': is_negative,
-                                        'subjectivity_score': pattern_subjectivity,
-                                        'subjective': is_subjective,
-                                        'url': "https://reddit.com" + comment.permalink,
-                                        'comment_date': comment_date,
-                                        'comment_timestamp': comment_timestamp,
-                                        'comment_hour': dt.hour,
-                                        'comment_year': dt.year,
-                                        'comment_month': dt.month,
-                                        'comment_day': dt.day
+                            # censor and lower
+                            censored_comment = profanity.censor(cleaned_comment).lower()
+
+                            commentjson = {
+                                            'comment_id': str(comment),
+                                            'subreddit': str(comment.subreddit),
+                                            'author': str(comment.author),
+                                            'comment_text': censored_comment,
+                                            'distinguished': comment.distinguished,
+                                            'submitter': comment.is_submitter,
+                                            'total_words': len(cleaned_comment.split()),
+                                            'reading_ease_score': comment_reading_ease_score,
+                                            'reading_ease': comment_reading_ease,
+                                            'reading_grade_level': comment_reading_grade_level,
+                                            'sentiment_score': pattern_polarity,
+                                            'censored': is_censored,
+                                            'comment_language': comment_language,
+                                            'positive': is_positive,
+                                            'neutral': is_neutral,
+                                            'negative': is_negative,
+                                            'subjectivity_score': pattern_subjectivity,
+                                            'subjective': is_subjective,
+                                            'url': "https://reddit.com" + comment.permalink,
+                                            'comment_date': comment_date,
+                                            'comment_timestamp': comment_timestamp,
+                                            'comment_hour': dt.hour,
+                                            'comment_year': dt.year,
+                                            'comment_month': dt.month,
+                                            'comment_day': dt.day
+                                        }
+
+                            comments_processed = comments_processed + 1
+
+                            # print("==================================")
+                            num_comments_collected = num_comments_collected + 1
+                            # print(num_comments_collected)
+                            # print(commentjson)
+
+                            # If batch_delivery is true, deliver to firehose in batches of 500 records. Otherwise, send each record individually
+                            if(batch_delivery):
+                                # add comment to the batch
+                                comments_batch.append(
+                                    {
+                                        'Data': (json.dumps(commentjson, ensure_ascii=False) + '\n').encode('utf8')
                                     }
+                                )
 
-                        comments_processed = comments_processed + 1
-
-                        # print("==================================")
-                        num_comments_collected = num_comments_collected + 1
-                        # print(num_comments_collected)
-                        # print(commentjson)
-
-                        # If batch_delivery is true, deliver to firehose in batches of 500 records. Otherwise, send each record individually
-                        if(batch_delivery):
-                            # add comment to the batch
-                            comments_batch.append(
-                                {
-                                    'Data': (json.dumps(commentjson, ensure_ascii=False) + '\n').encode('utf8')
-                                }
-                            )
-
-                            #send batches of 500 comments
-                            if (comments_processed % 500 == 0):
-                                print("sending batch to firehose...")
-                                send_batch_to_firehose(comments_batch)
-                                print("Comments sent to firehose: ", comments_processed)
-                                comments_batch = []
-                                print("emptied batch...")
-                        else:
-                            send_record_to_firehose(commentjson)
+                                #send batches of 500 comments
+                                if (comments_processed % 500 == 0):
+                                    print("sending batch to firehose...")
+                                    send_batch_to_firehose(comments_batch)
+                                    print("Comments sent to firehose: ", comments_processed)
+                                    comments_batch = []
+                                    print("emptied batch...")
+                            else:
+                                send_record_to_firehose(commentjson)
 
         except Exception as e:
             print(str(e))
