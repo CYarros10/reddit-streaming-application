@@ -13,8 +13,8 @@ from time import sleep
 from datetime import datetime, timezone
 
 firehose_client = boto3.client('firehose', region_name="us-east-1")
-#sns_client = boto3.client('sns', region_name="us-east-1")
-#sns_targetARN = "<insert-sns-target-arn>"
+# sns_client = boto3.client('sns', region_name="us-east-1")
+# sns_targetARN = "<insert-sns-target-arn>"
 
 bot_list = ['AutoModerator', 'keepthetips', 'MAGIC_EYE_BOT',
             'Funny_Sentinel', 'Funny-Mod', 'Showerthoughts_Mod', 'autotldr',
@@ -46,13 +46,13 @@ def send_record_to_firehose(comment):
         print(str(e))
 
 # Send alert to sns topic
-def send_sns_alert(message, subject):
-    # Publish a simple message to the specified SNS topic
-    sns_client.publish(
-        TargetArn=sns_targetARN,
-        Message=str(message),
-        Subject=str(subject)
-    )
+# def send_sns_alert(message, subject):
+#     # Publish a simple message to the specified SNS topic
+#     sns_client.publish(
+#         TargetArn=sns_targetARN,
+#         Message=str(message),
+#         Subject=str(subject)
+#     )
 
 def remove_emoji(comment):
     emoji_pattern = re.compile("["
