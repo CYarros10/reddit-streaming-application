@@ -67,11 +67,11 @@ def get_comment_sentiment(comment):
     pattern_analysis = TextBlob(comment)
     return pattern_analysis.sentiment
 
-def get_comment_language(comment):
-    language = ''
-    if (len(comment) > 3):
-        language = TextBlob(comment).detect_language()
-    return language
+# def get_comment_language(comment):
+#     language = ''
+#     if (len(comment) > 3):
+#         language = TextBlob(comment).detect_language()
+#     return language
 
 if len(sys.argv) >= 2:
 
@@ -145,7 +145,7 @@ if len(sys.argv) >= 2:
                                 is_subjective = 1
 
                             # language
-                            comment_language = get_comment_language(cleaned_comment)
+                            #comment_language = get_comment_language(cleaned_comment)
 
                             # Readability statistics
                             comment_reading_ease_score = textstat.flesch_reading_ease(cleaned_comment)
@@ -175,7 +175,7 @@ if len(sys.argv) >= 2:
                                             'reading_grade_level': comment_reading_grade_level,
                                             'sentiment_score': pattern_polarity,
                                             'censored': is_censored,
-                                            'comment_language': comment_language,
+                                            #'comment_language': comment_language,
                                             'positive': is_positive,
                                             'neutral': is_neutral,
                                             'negative': is_negative,
