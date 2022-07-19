@@ -16,8 +16,8 @@ from datetime import datetime, timezone
 import os
 from google.cloud import pubsub_v1
 
-project_id = "<insert-project-id>"
-topic_id = "<insert-topic-id>"
+project_id = "<insert-project-id-here>"
+topic_id = "<insert-topic-id-here>"
 
 # Configure the batch to publish as soon as there are 10 messages
 # or 1 KiB of data, or 1 second has passed.
